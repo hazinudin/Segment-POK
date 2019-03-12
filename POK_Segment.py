@@ -28,8 +28,8 @@ with da.UpdateCursor(POK_Table,
 
         with da.SearchCursor(Network, 'SHAPE@', where_clause="{0}='{1}'".format(Network_RouteID, t_row[6])) as search_cur:
             for s_row in search_cur:
-                from_m = s_row[0].measureOnLine(start_point)
-                to_m = s_row[0].measureOnLine(end_point)
+                from_m = s_row[0].measureOnLine(start_point)/1000  # Divided by 1000 to converts the unit to KM
+                to_m = s_row[0].measureOnLine(end_point)/1000
 
                 dist_from = s_row[0].distanceTo(start_point)
                 dist_to = s_row[0].distanceTo(end_point)
