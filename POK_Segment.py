@@ -22,19 +22,23 @@ out_to = ['TO_M', 'DOUBLE']
 out_dist_st = ['STA_DIST', 'DOUBLE']
 out_dist_end = ['END_DIST', 'DOUBLE']
 field_definition = [out_rid, out_from, out_to, out_dist_end, out_dist_st]
+
 field_names = [field[0] for field in field_definition]
 field_names_shapes = field_names
 field_names_shapes.append('SHAPE@')
 Network_SpatRef = Describe(Network).spatialReference
 
+# Create an empty feature class for storing all the line segment
 CreateFeatureclass_management(env.scratchGDB, OutputLine, geometry_type='POLYLINE', spatial_reference=Network_SpatRef)
-env.overwriteOutput = True
+env.overwriteOutput = True # Allow overwrite the output
 
 for field in field_definition:
-    field_name = field[0]
-    field_type = field[1]
+    field_name = field[0]  # Field name
+    field_type = field[1]  # Field type
+    # Create all the necessary field for the line feature class
     AddField_management(env.scratchGDB+'/'+OutputLine, field_name, field_type)
 
+# The insert cursor for line feature class
 line_ins = da.InsertCursor(env.scratchGDB+'/'+OutputLine, field_names_shapes)
 
 with da.SearchCursor(POK_Table, [X_Start, Y_Start, X_End, Y_End, POK_RID]) as search:
