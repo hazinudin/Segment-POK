@@ -21,15 +21,17 @@ for route in route_list:
     df_route.sort_values(by=[FromMeas, ToMeas], inplace=True)
 
     for index, row in df_route.iterrows():
-        overlap_i = df_route.loc[((df_route[FromMeas] < row[FromMeas]) & (df_route[ToMeas] > row[FromMeas])) |
-                                 ((df_route[FromMeas] > row[FromMeas]) & (df_route[ToMeas] < row[ToMeas])) |
-                                 ((df_route[FromMeas] < row[ToMeas]) & (df_route[FromMeas] > row[FromMeas]))].index
+        complete_overlap = ((df_route[FromMeas] > row[FromMeas]) & (df_route[ToMeas] < row[ToMeas]))
+        partial_front_overlap = ((df_route[FromMeas] < row[FromMeas]) & (df_route[ToMeas] > row[FromMeas]))
+        overlap_i = df_route.loc[partial_front_overlap | complete_overlap].index
         if len(overlap_i) != 0:
             OID_list = df_route.loc[overlap_i, OID_field].values.tolist()
             OID_list = str(OID_list).strip('[]')
 
             if len(OID_list) > 195:
                 OID_list = None
+        else:
+            OID_list = None
 
             with da.UpdateCursor(EventTable, OverlapOID,
                                  where_clause="OBJECTID IN ({0})".format(row[OID_field])) as cursor:
